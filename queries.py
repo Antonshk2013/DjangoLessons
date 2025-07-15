@@ -9,17 +9,9 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 django.setup()
 
 # ИМПОРТЫ НАШЕГО ФУНКЦИОНАЛА ДОЛЖНЫ БЫТЬ СТРОГО ПОСЛЕ СИСТЕМНОЙ НАСТРОЙКИ ВЫШЕ
-from src.library.models import (
-    Book,
-    Category,
-    Author,
-    Post,
-    Library,
-    LibrariesMembers,
-    Borrow,
-    LibraryRecord)
+from src.library.models import Book, Category, Author, Post, Borrow, book
 from src.users.models import User
-from src.choices.base import Genre, Gender, Role, Language
+from src.choices.base import Genre
 
 from django.db.models.query import QuerySet
 from django.db.models import Q, F, Count, Avg, Min, Max
