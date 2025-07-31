@@ -1,3 +1,4 @@
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,6 +9,9 @@ from rest_framework.generics import (
 )
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.views import APIView
+from django.contrib.auth.hashers import make_password
+
 
 from src.users.service import UserService
 from src.users.dtos import ListUsersDTO, DetailedUserDTO, CreateUserDTO
@@ -117,3 +121,14 @@ class UserRetrieveAPIView(RetrieveUpdateDestroyAPIView):
             return DetailedUserDTO
         return CreateUserDTO
 
+
+class UserPasswordAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+    service = UserService()
+
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        result = self.service.update_user_password(request)
+
+        if result.success:
+            return Response(result.data, status=status.HTTP_200_OK)
+        return Response(result.message, status=status.HTTP_400_BAD_REQUEST)
