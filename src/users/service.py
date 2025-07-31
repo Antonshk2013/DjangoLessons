@@ -1,6 +1,8 @@
+from rest_framework.request import Request
+
 from src.users.repository import UserRepository
 from src.shared.base_service_response import ServiceResponse, ErrorType
-from src.users.dtos import ListUsersDTO, DetailedUserDTO
+from src.users.dtos import ListUsersDTO, DetailedUserDTO, ChangePasswordDTO
 
 
 class UserService:
@@ -46,3 +48,23 @@ class UserService:
                 message=f"Error retrieving user: {str(e)}",
                 error_type=ErrorType.UNKNOWN_ERROR
             )
+
+    def update_user_password(self, request: Request) -> ServiceResponse:
+        serializer = ChangePasswordDTO(request.data)
+        if not serializer.is_valid():
+            return ServiceResponse(
+                success=False,
+                error_type=ErrorType.VALIDATION_ERROR,
+                message=serializer.errors)
+        user = request.user
+        if not user.check_password(serializer.data['old_password']):
+            return ServiceResponse(
+                success=False,
+                error_type=ErrorType.VALIDATION_ERROR,
+                message="Неверный пароль")
+        user.set_password(serializer.data['new_password'])
+        user.save()
+        return ServiceResponse(
+            success=True,
+            message="Пароль успешно изменен"
+        )
